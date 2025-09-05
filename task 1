@@ -1,0 +1,37 @@
+# Task-01: Linear Regression for House Price Prediction
+# Based on Square Footage, Bedrooms, and Bathrooms
+
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+# Sample dataset (self-contained, no CSV required)
+data = {
+    "SquareFootage": [1000, 1500, 1800, 2400, 3000, 3500, 4000],
+    "Bedrooms": [2, 3, 3, 4, 5, 4, 6],
+    "Bathrooms": [1, 2, 2, 3, 4, 3, 5],
+    "Price": [200000, 250000, 280000, 350000, 450000, 500000, 600000]
+}
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+
+# Features (X) and Target (y)
+X = df[["SquareFootage", "Bedrooms", "Bathrooms"]]
+y = df["Price"]
+
+# Train Linear Regression model on ALL data
+model = LinearRegression()
+model.fit(X, y)
+
+# Predictions for all rows
+df["PredictedPrice"] = model.predict(X)
+
+# Display model details
+print("📌 Model Intercept (Base Price):", round(model.intercept_, 2))
+print("📌 Model Coefficients:")
+for feature, coef in zip(X.columns, model.coef_):
+    print(f"   {feature}: {round(coef, 2)}")
+
+# Display Actual vs Predicted Prices
+print("\n📊 Actual vs Predicted Prices:")
+print(df[["SquareFootage", "Bedrooms", "Bathrooms", "Price", "PredictedPrice"]])
