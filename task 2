@@ -1,0 +1,69 @@
+import pandas as pd
+from sklearn.cluster import KMeans
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Sample dataset
+data = {
+    "CustomerID": [1, 2, 3, 4, 5, 6, 7, 8],
+    "Age": [25, 34, 45, 23, 40, 35, 52, 33],
+    "AnnualIncome": [40000, 50000, 60000, 30000, 80000, 70000, 120000, 65000],
+    "SpendingScore": [60, 40, 30, 70, 20, 50, 10, 45]
+}
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+
+# Select features
+X = df[["Age", "AnnualIncome", "SpendingScore"]]
+
+# Apply KMeans
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+df["Cluster"] = kmeans.fit_predict(X)
+
+# Round cluster centers for readability
+cluster_centers = np.round(kmeans.cluster_centers_, 2)
+
+# 📌 Display results
+print("📌 Cluster Centers (Age, Income, SpendingScore):")
+print(cluster_centers)
+
+print("\n📊 Cluster Sizes:")
+print(df["Cluster"].value_counts())
+
+print("\n📝 Customer Segmentation Results:")
+print(df[["CustomerID", "Age", "AnnualIncome", "SpendingScore", "Cluster"]])
+
+# Add interpretation
+profiles = {
+    0: "💼 High Income, Low Spending",
+    1: "🛍 Young Customers, High Spending",
+    2: "👨‍👩‍👦 Middle Income, Moderate Spending"
+}
+
+print("\n📖 Cluster Profiles:")
+for cluster, profile in profiles.items():
+    print(f"Cluster {cluster}: {profile}")
+
+# 🎨 3D Scatter Plot
+fig = plt.figure(figsize=(8,6))
+ax = fig.add_subplot(111, projection="3d")
+
+scatter = ax.scatter(
+    df["Age"], df["AnnualIncome"], df["SpendingScore"],
+    c=df["Cluster"], cmap="Set2", s=100, alpha=0.7, edgecolors="k"
+)
+
+# Plot cluster centers
+ax.scatter(
+    cluster_centers[:, 0], cluster_centers[:, 1], cluster_centers[:, 2],
+    c="red", s=300, marker="X", label="Centroids"
+)
+
+ax.set_xlabel("Age")
+ax.set_ylabel("Annual Income")
+ax.set_zlabel("Spending Score")
+ax.set_title("Customer Segmentation - KMeans Clustering")
+ax.legend()
+plt.show()
